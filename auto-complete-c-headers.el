@@ -118,7 +118,7 @@ enabled for directories returned by
 just returns the path and content of the header file which
 `candidate' specifies."
   (let ((path
-         (assoc-default candidate achead:latest-results-alist 'string=)))
+         (assoc-default candidate achead:ac-latest-results-alist 'string=)))
     (ignore-errors
       (with-temp-buffer
         (insert path)
