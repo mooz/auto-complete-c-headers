@@ -36,8 +36,6 @@
   matches a pattern in `achead:include-patterns', the candidates
   will be displayed.")
 
-(setq achead:include-directories (list "." "/usr/include" "/usr/local/include"))
-
 (defvar achead:include-directories (list "." "/usr/include" "/usr/local/include")
   "Standard include directories. This variable should be
 customized to your environment via commands like,
