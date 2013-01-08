@@ -86,19 +86,40 @@ enabled for directories returned by
                      ;; (concat dir file) should be bounded to a variable like `real-path'
                      when (or (file-directory-p (concat dir file))
                               (and achead:include-patterns (achead:path-should-be-displayed (concat dir file))))
-                     collect (if (file-directory-p (concat dir file))
-                                 (concat dir-suffix (concat file "/"))
-                               (concat dir-suffix file)))))
+                     collect (cons (if (file-directory-p (concat dir file))
+                                       (concat dir-suffix (concat file "/"))
+                                     (concat dir-suffix file))
+                                   (concat dir file)))))
+
+(defvar achead:ac-latest-results-alist nil
+  "Keeps latest results, which is a list of (candidate . header-path).")
+
+(defun achead:documentation-for-candidate (candidate)
+  "Generate documentation for a candidate `candidate'. For now,
+just returns the path and content of the header file which
+`candidate' specifies."
+  (let ((path
+         (assoc-default candidate achead:latest-results-alist 'string=)))
+    (ignore-errors
+      (with-temp-buffer
+        (insert path)
+        (unless (file-directory-p path)
+          (insert "\n--------------------------\n")
+          (insert-file-contents path nil))
+        (buffer-string)))))
 
 (defun achead:ac-candidates ()
   "Candidate-collecting function for `auto-complete'."
   (ignore-errors
-    (achead:get-include-file-candidates (file-name-directory ac-prefix))))
+    (setq achead:ac-latest-results-alist (achead:get-include-file-candidates (file-name-directory ac-prefix)))
+    (loop for (candidate . path) in achead:ac-latest-results-alist
+          collect candidate)))
 
 (ac-define-source c-headers
   `((init . (setq achead:include-cache nil))
     (candidates . achead:ac-candidates)
     (prefix . ,achead:ac-prefix)
+    (document . achead:documentation-for-candidate)
     (requires . 0)
     (symbol . "I")
     (action . ac-start)
