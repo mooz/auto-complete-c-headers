@@ -28,7 +28,10 @@
 ;; For `remove-duplicates'
 (require 'cl)
 
-(defvar achead:include-patterns (list "\\.\\(h\\|hpp\\|hh\\)$")
+(defvar achead:include-patterns (list
+                                 "\\.\\(h\\|hpp\\|hh\\)$" ; Standard header files
+                                 "^[a-zA-Z-]+$"           ; C++'s suffix-free include files (iostream, vector, ...)
+                                 )
   "Regexp pattern list that limits the candidates. If a candidate
   matches a pattern in `achead:include-patterns', the candidates
   will be displayed.")
