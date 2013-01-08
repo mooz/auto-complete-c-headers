@@ -25,15 +25,29 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+;; For `remove-duplicates'
+(require 'cl)
 
 (defvar achead:include-patterns (list "\\.\\(h\\|hpp\\|hh\\)$")
   "Regexp pattern list that limits the candidates. If a candidate
   matches a pattern in `achead:include-patterns', the candidates
   will be displayed.")
 
-(defvar achead:include-directories (list "/usr/include/" "/usr/local/include/")
-  "Standard include directories.")
+(setq achead:include-directories (list "." "/usr/include" "/usr/local/include"))
+
+(defvar achead:include-directories (list "." "/usr/include" "/usr/local/include")
+  "Standard include directories. This variable should be
+customized to your environment via commands like,
+
+`gcc -xc -E -v -`
+
+or
+
+`gcc -xc++ -E-v -`
+
+If you need to do more complicated things (like `pkg-config`),
+please consider to make your own function and set it to
+`achead:get-include-directories-function'.")
 
 (defvar achead:get-include-directories-function 'achead:get-include-directories
   "Function that collects include directories.")
@@ -77,7 +91,9 @@
 enabled for directories returned by
 `achead:get-include-directories-function'."
   (loop with dir-suffix = (or basedir "")
-        for include-base in (cons dir-suffix (funcall achead:get-include-directories-function))
+        with include-base-dirs = (delete-duplicates (funcall achead:get-include-directories-function)
+                                                    :test 'string=)
+        for include-base in include-base-dirs
         append (loop with dir = (file-name-directory (concat (file-name-as-directory include-base)
                                                              dir-suffix))
                      with files = (achead:file-list-for-directory dir)
