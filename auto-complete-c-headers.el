@@ -92,7 +92,8 @@ enabled for directories returned by
 
 (defun achead:ac-candidates ()
   "Candidate-collecting function for `auto-complete'."
-  (achead:get-include-file-candidates (file-name-directory ac-prefix)))
+  (ignore-errors
+    (achead:get-include-file-candidates (file-name-directory ac-prefix))))
 
 (ac-define-source c-headers
   `((init . (setq achead:include-cache nil))
