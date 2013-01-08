@@ -30,11 +30,11 @@
 
 (defvar achead:include-patterns (list
                                  "\\.\\(h\\|hpp\\|hh\\)$" ; Standard header files
-                                 "^[a-zA-Z-]+$"           ; C++'s suffix-free include files (iostream, vector, ...)
+                                 "/[a-zA-Z-]+$"           ; C++'s suffix-free include files (iostream, vector, ...)
                                  )
-  "Regexp pattern list that limits the candidates. If a candidate
-  matches a pattern in `achead:include-patterns', the candidates
-  will be displayed.")
+  "Regexp pattern list that limits the candidates. If a header
+  file path matches a pattern in `achead:include-patterns', the
+  candidates will be displayed.")
 
 (defvar achead:include-directories (list "." "/usr/include" "/usr/local/include")
   "Standard include directories. This variable should be
