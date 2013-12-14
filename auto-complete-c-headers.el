@@ -26,7 +26,7 @@
 ;;; Code:
 
 ;; For `remove-duplicates'
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 (defvar achead:include-patterns (list
                                  "\\.\\(h\\|hpp\\|hh\\)$" ; Standard header files
