@@ -3,6 +3,7 @@
 ;; Copyright (C) 2013  Masafumi Oyamada
 
 ;; Author: Masafumi Oyamada <stillpedant@gmail.com>
+;; Package-Requires: ((auto-complete "1.4"))
 ;; Keywords: c
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,6 +28,7 @@
 
 ;; For `remove-duplicates'
 (require 'cl)
+(require 'auto-complete)
 
 (defvar achead:include-patterns (list
                                  "\\.\\(h\\|hpp\\|hh\\)$" ; Standard header files
