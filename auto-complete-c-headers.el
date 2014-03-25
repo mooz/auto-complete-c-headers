@@ -32,7 +32,7 @@
 
 (defvar achead:include-patterns (list
                                  "\\.\\(h\\|hpp\\|hh\\)$" ; Standard header files
-                                 "/[a-zA-Z-]+$"           ; C++'s suffix-free include files (iostream, vector, ...)
+                                 "/[a-zA-Z-_]+$"           ; C++'s suffix-free include files (iostream, vector, unordered_map, ...)
                                  )
   "Regexp pattern list that limits the candidates. If a header
   file path matches a pattern in `achead:include-patterns', the
@@ -46,7 +46,7 @@ customized to your environment via commands like,
 
 or
 
-`gcc -xc++ -E-v -`
+`gcc -xc++ -E -v -`
 
 If you need to do more complicated things (like `pkg-config`),
 please consider to make your own function and set it to
