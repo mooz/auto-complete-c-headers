@@ -29,6 +29,7 @@
 ;; For `remove-duplicates'
 (require 'cl)
 (require 'auto-complete)
+(require 'tramp)
 
 (defvar achead:include-patterns (list
                                  "\\.\\(h\\|hpp\\|hh\\)$" ; Standard header files
@@ -64,6 +65,9 @@ please consider to make your own function and set it to
 (defvar achead:ac-prefix "#\\(?:include\\|import\\)[ \t]*[<\"][ \t]*\\([^\"<>' \t\r\n]+\\)"
   "`prefix' value for `auto-complete'")
 
+(defvar achead:inspect-remote-directories t
+  "If t, remote directories will be searched.")
+
 (defun achead:get-include-directories-from-options (cmd-line-options)
   "Extract include directory names from command line options
   like (\"-I~/.local/include/\" \"-I~/src/include/\")."
@@ -93,22 +97,25 @@ please consider to make your own function and set it to
   "Get all header files under `basedir' as if -I option is
 enabled for directories returned by
 `achead:get-include-directories-function'."
-  (loop with dir-suffix = (or basedir "")
-        with include-base-dirs = (delete-duplicates (funcall achead:get-include-directories-function)
-                                                    :test 'string=)
-        for include-base in include-base-dirs
-        append (loop with dir = (file-name-directory (concat (file-name-as-directory include-base)
-                                                             dir-suffix))
-                     with files = (achead:file-list-for-directory dir)
-                     for file in files
-                     ;; FIXME: Are there a good way to bind variable inside a loop (`with' cannot capture `file')?
-                     ;; (concat dir file) should be bounded to a variable like `real-path'
-                     when (or (file-directory-p (concat dir file))
-                              (and achead:include-patterns (achead:path-should-be-displayed (concat dir file))))
-                     collect (cons (if (file-directory-p (concat dir file))
-                                       (concat dir-suffix (concat file "/"))
-                                     (concat dir-suffix file))
-                                   (concat dir file)))))
+  (let ((remote (and achead:inspect-remote-directories
+                     (file-remote-p default-directory))))
+    (loop with dir-suffix = (or basedir "")
+          with include-base-dirs = (delete-duplicates (funcall achead:get-include-directories-function)
+                                                      :test 'string=)
+          for include-base in include-base-dirs
+          append (loop with dir = (file-name-directory (concat (file-name-as-directory include-base)
+                                                               dir-suffix))
+                       with files = (achead:file-list-for-directory (concat remote dir))
+                       for file in files
+                       ;; FIXME: Are there a good way to bind variable inside a loop (`with' cannot capture `file')?
+                       ;; (concat dir file) should be bounded to a variable like `real-path'
+                       when (or (file-directory-p (concat dir file))
+                                (and achead:include-patterns (achead:path-should-be-displayed (concat dir file))))
+                       collect (cons (if (file-directory-p (concat dir file))
+                                         (concat dir-suffix (concat file "/"))
+                                       (concat dir-suffix file))
+                                     (concat dir file)))))
+  )
 
 (defvar achead:ac-latest-results-alist nil
   "Keeps latest results, which is a list of (candidate . header-path).")
